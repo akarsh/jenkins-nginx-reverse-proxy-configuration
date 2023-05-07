@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    user: root
+    ports:
+      - "50000:50000"
+    volumes:
+      - 'jenkins-data:/var/jenkins_home'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '$HOME:/home'
+    networks:
+      - jenkins-net
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+  nginx:
+    image: nginx:stable
+    user: root
+    networks:
+      - jenkins-net
+    ports:
+      - '80:80'
+    volumes:
+      - '/var/log/nginx/jenkins'
+      - '$PWD/jenkins.conf:/etc/nginx/conf.d/default.conf'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+volumes:
+  jenkins-data:
+networks:
+  jenkins-net:
